@@ -8,8 +8,10 @@
  * under which the software has been supplied.
  */
 
-package com.ge.predix.solsvc.edgestarter.processor;
+package com.ge.predix.solsvc.edgestarter.impl;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -37,28 +39,34 @@ import com.ge.dspmicro.validateroute.api.PongMessage;
 import com.ge.dspmicro.validateroute.api.PongMessage.PongStatus;
 import com.ge.dspmicro.websocketriver.send.api.IWebsocketSend;
 import com.ge.dspmicro.websocketriver.send.impl.WebSocketRiverPing;
-import com.ge.predix.solsvc.edgestarter.rest.ISampleProcessor;
+import com.ge.predix.solsvc.edgestarter.api.ISampleProcessor;
 import com.ge.predixmachine.datamodel.datacomm.EdgeDataList;
 
 /**
  * This class provides a Processor implementation which will process the data as
  * per configuration on the spillway.
  */
-@Component(immediate = true, name = SampleProcessor.SERVICE_PID, service = { IProcessor.class, ISampleProcessor.class })
-public class SampleProcessor implements IProcessor, ISampleProcessor {
+@Component(immediate = true, 
+	name = MachineProcessor.SERVICE_PID, 
+	service = { 
+		IProcessor.class, 
+		ISampleProcessor.class,
+	}
+)
+public class MachineProcessor implements IProcessor, ISampleProcessor {
 
 	/**
 	 * Create logger to report errors, warning massages, and info messages
 	 * (runtime Statistics)
 	 */
-	private static Logger _logger = LoggerFactory.getLogger(SampleProcessor.class);
+	private static Logger _logger = LoggerFactory.getLogger(MachineProcessor.class);
 
 	/** Service PID for Sample Machine Adapter */
-	public static final String SERVICE_PID = "com.ge.predix.solsvc.simulator.processor"; //$NON-NLS-1$
+	public static final String SERVICE_PID = "com.ge.predix.solsvc.edgestarter.processor"; //$NON-NLS-1$
 
 	private Calendar lastDataSent = Calendar.getInstance();
 
-	private IWebsocketSend websocketSend;
+	private IWebsocketSend websocketSend;	
 
 	/**
 	 * @param ctx
@@ -66,7 +74,7 @@ public class SampleProcessor implements IProcessor, ISampleProcessor {
 	 */
 	@Activate
 	public void activate(ComponentContext ctx) {
-		_logger.info("Spillway service activated."); //$NON-NLS-1$
+		_logger.info("Starting MachineProcessor " + SERVICE_PID); //$NON-NLS-1$	
 	}
 
 	/**
@@ -76,21 +84,6 @@ public class SampleProcessor implements IProcessor, ISampleProcessor {
 	@SuppressWarnings("unchecked")
 	@Deactivate
 	public void deactivate(ComponentContext ctx) {
-		try {
-			ServiceReference<IValidateRoute>[] pingServices = (ServiceReference[]) ctx.getBundleContext()
-					.getAllServiceReferences(IValidateRoute.class.getName(), null);
-			if (pingServices != null) {
-				for (ServiceReference<IValidateRoute> route : pingServices) {
-					IValidateRoute service = (IValidateRoute) ctx.getBundleContext().getService(route);
-					if ((service != null) && ("WebSocket River Route".equals(service.getRouteName()))) {
-						((WebSocketRiverPing) service).removeIWebsocketSend(this.websocketSend);
-						break;
-					}
-				}
-			}
-		} catch (InvalidSyntaxException e) {
-			_logger.error("Error when deactivating", e);
-		}
 		if (_logger.isDebugEnabled()) {
 			_logger.debug("Spillway service deactivated."); //$NON-NLS-1$
 		}
@@ -154,7 +147,10 @@ public class SampleProcessor implements IProcessor, ISampleProcessor {
 		IPingMessage ping = route.createPingMessage(params, pongNotification);
 		route.ping(ping);
 		PongStatus status = pongNotification.status();
-		while (status == null || !status.equals(PongStatus.SUCCESSFUL) || !status.equals(PongStatus.COMPLETED) || !status.equals(PongStatus.FAILED)) {
+		Instant start = Instant.now();
+		while (
+			(Duration.between(Instant.ofEpochMilli(start.toEpochMilli()),Instant.now()).toMinutes() < 1 ) &&
+			(status == null || !status.equals(PongStatus.SUCCESSFUL) || !status.equals(PongStatus.COMPLETED) || !status.equals(PongStatus.FAILED))) {
 			try {
 				_logger.info("sssssss");
 				Thread.sleep(1000);
@@ -166,7 +162,7 @@ public class SampleProcessor implements IProcessor, ISampleProcessor {
 				break;
 			}
 		}	
-		return status.equals(PongStatus.SUCCESSFUL);
+		return status != null && status.equals(PongStatus.SUCCESSFUL);
 	}
 
 	public IWebsocketSend getWebsocketSend() {
@@ -183,9 +179,6 @@ public class SampleProcessor implements IProcessor, ISampleProcessor {
 
 		@Override
 		public void notify(IPingMessage pingMessage, PongMessage pongMessage) {
-			// called when success or failed
-			_logger.info(".........................Recived Pong message");
-			_logger.info("Pong Status .................."+pongMessage.getPongStatus().name());
 			status = pongMessage.getPongStatus();
 		}
 

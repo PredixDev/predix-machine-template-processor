@@ -8,7 +8,7 @@
 * under which the software has been supplied.
 */
 
-package com.ge.predix.solsvc.edgestarter.adapter;
+package com.ge.predix.solsvc.edgestarter.impl;
 
 import java.io.IOException;
 
@@ -25,8 +25,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ge.predix.solsvc.edgestarter.rest.IHttpRestServer;
-import com.ge.predix.solsvc.edgestarter.rest.IMachineStatusService;
+import com.ge.predix.solsvc.edgestarter.api.IHttpRestServer;
+import com.ge.predix.solsvc.edgestarter.api.IMachineStatusService;
+import com.ge.predix.solsvc.edgestarter.model.MachineStatusResponse;
 
 /**
  *
@@ -42,7 +43,7 @@ public class MachineStatusRestService implements IHttpRestServer
 	
 
 	/** Service PID for Sample Machine Adapter */
-	public static final String SERVICE_PID = "com.ge.predix.solsvc.edgestarter.processor"; //$NON-NLS-1$
+	public static final String SERVICE_PID = "com.ge.predix.solsvc.edgestarter.service"; //$NON-NLS-1$
 	/**
 	 * The regular expression used to split property values into String array.
 	 */
@@ -71,7 +72,7 @@ public class MachineStatusRestService implements IHttpRestServer
 	 */
 	@Activate
 	public void activate(ComponentContext ctx) throws IOException {
-		_logger.info("Starting sample " + ctx.getBundleContext().getBundle().getSymbolicName()); //$NON-NLS-1$	
+		_logger.info("Starting MachineStatusRestService : " + SERVICE_PID); //$NON-NLS-1$	
 	}
 
 	/**

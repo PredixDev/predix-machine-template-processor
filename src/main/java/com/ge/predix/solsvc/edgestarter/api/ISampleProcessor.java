@@ -1,4 +1,4 @@
-package com.ge.predix.solsvc.edgestarter.rest;
+package com.ge.predix.solsvc.edgestarter.api;
 
 import java.util.Calendar;
 

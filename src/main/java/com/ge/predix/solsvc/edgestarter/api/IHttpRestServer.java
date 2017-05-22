@@ -8,7 +8,7 @@
  * under which the software has been supplied.
  */
  
-package com.ge.predix.solsvc.edgestarter.rest;
+package com.ge.predix.solsvc.edgestarter.api;
 
 /**
  * 

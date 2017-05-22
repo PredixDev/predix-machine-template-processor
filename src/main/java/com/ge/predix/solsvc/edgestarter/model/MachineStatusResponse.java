@@ -1,4 +1,4 @@
-package com.ge.predix.solsvc.edgestarter.adapter;
+package com.ge.predix.solsvc.edgestarter.model;
 
 import java.util.Calendar;
 
