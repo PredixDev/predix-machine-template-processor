@@ -5,6 +5,8 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.util.Dictionary;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
@@ -136,10 +138,16 @@ public class PredixKitService extends Thread implements IPredixKitService{
 	            // Sending a GET request to the cloud.
 				_logger.info("Get Device Info");
 				_logger.info("Kit Device URL : "+this.config.getPredixKitGetDeviceURL()+InetAddress.getLocalHost().getHostName());
-	            URI getDeviceURL = new URI(this.config.getPredixKitGetDeviceURL()+InetAddress.getLocalHost().getHostName());
+	            URI getDeviceURL = new URI(this.config.getPredixKitGetDeviceURL()+"/"+InetAddress.getLocalHost().getHostName());
 	
 	            HttpResponseWrapper httpResponse = this.cloudHttpClient.get(getDeviceURL);
+	            
 	            _logger.info("GetDeviceResponse : "+httpResponse.getStatusCode());
+	            
+	            if (httpResponse.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
+	            	_logger.error("Device not registerd. Disconecting machine from Predix.");
+		        	disconnectingMachineFromPredix();
+	            }
 	            String content = httpResponse.getContent();
 	            _logger.info("Response : "+content);
 	            if (!"".equals(content)) 
