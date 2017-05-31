@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.util.Dictionary;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.osgi.framework.InvalidSyntaxException;
@@ -137,16 +136,17 @@ public class PredixKitService extends Thread implements IPredixKitService{
 	        {
 	            // Sending a GET request to the cloud.
 				_logger.info("Get Device Info");
-				_logger.info("Kit Device URL : "+this.config.getPredixKitGetDeviceURL()+InetAddress.getLocalHost().getHostName());
-	            URI getDeviceURL = new URI(this.config.getPredixKitGetDeviceURL()+"/"+InetAddress.getLocalHost().getHostName());
+				String url = this.config.getPredixKitGetDeviceURL()+"/"+InetAddress.getLocalHost().getHostName();
+				_logger.info("Kit Device URL : "+url);
+	            URI getDeviceURL = new URI(url);
 	
 	            HttpResponseWrapper httpResponse = this.cloudHttpClient.get(getDeviceURL);
 	            
 	            _logger.info("GetDeviceResponse : "+httpResponse.getStatusCode());
 	            
 	            if (httpResponse.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
-	            	_logger.error("Device not registerd. Disconecting machine from Predix.");
-		        	disconnectingMachineFromPredix();
+	            	_logger.error("Device Registration not found.");
+		        //disconnectingMachineFromPredix();
 	            }
 	            String content = httpResponse.getContent();
 	            _logger.info("Response : "+content);
@@ -157,8 +157,8 @@ public class PredixKitService extends Thread implements IPredixKitService{
 	                _logger.info("Activation date : "+device.getActivationDate());
 	            }
 	        }catch(Exception e){
-	        	_logger.error("Device activation expired. Disconecting machine from Predix.");
-	        	disconnectingMachineFromPredix();
+	        	_logger.error("An error occurred getting Registered Device Info",e);
+	        	//disconnectingMachineFromPredix();
 	        }
 		}
     }
@@ -172,8 +172,11 @@ public class PredixKitService extends Thread implements IPredixKitService{
 		if (_logger.isDebugEnabled()) {
 			// _logger.debug(_resources.getString("GatewayThread.gateway_starting"));
 		}
+		_logger.info("Kit URL : "+this.config.getPredixKitGetDeviceURL());
 		validateDevice();
-		while (!this.isShutdown) {
+		while (!this.isShutdown 
+				&& this.config.getPredixKitGetDeviceURL() != null 
+						&& !"".equals(this.config.getPredixKitGetDeviceURL())) {
 			try {
 				sleep(this.currentInterval * 1000);
 			} catch (InterruptedException e) {
@@ -279,5 +282,11 @@ public class PredixKitService extends Thread implements IPredixKitService{
 	@Reference
 	public void setConfigurationAdmin(ConfigurationAdmin configurationAdmin) {
 		this.configurationAdmin = configurationAdmin;
+	}
+
+	@Override
+	public Boolean isRegistered() {
+		return this.config.getPredixKitGetDeviceURL() != null 
+				&& !"".equals(this.config.getPredixKitGetDeviceURL());
 	}
 }

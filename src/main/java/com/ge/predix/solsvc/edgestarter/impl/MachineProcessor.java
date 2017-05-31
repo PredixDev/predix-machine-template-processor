@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -38,7 +36,6 @@ import com.ge.dspmicro.validateroute.api.IValidateRoute;
 import com.ge.dspmicro.validateroute.api.PongMessage;
 import com.ge.dspmicro.validateroute.api.PongMessage.PongStatus;
 import com.ge.dspmicro.websocketriver.send.api.IWebsocketSend;
-import com.ge.dspmicro.websocketriver.send.impl.WebSocketRiverPing;
 import com.ge.predix.solsvc.edgestarter.api.ISampleProcessor;
 import com.ge.predixmachine.datamodel.datacomm.EdgeDataList;
 
