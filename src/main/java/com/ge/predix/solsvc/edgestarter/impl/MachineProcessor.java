@@ -149,7 +149,7 @@ public class MachineProcessor implements IProcessor, ISampleProcessor {
 			(Duration.between(Instant.ofEpochMilli(start.toEpochMilli()),Instant.now()).toMinutes() < 1 ) &&
 			(status == null || !status.equals(PongStatus.SUCCESSFUL) || !status.equals(PongStatus.COMPLETED) || !status.equals(PongStatus.FAILED))) {
 			try {
-				_logger.info("sssssss");
+				//_logger.info("sssssss");
 				Thread.sleep(1000);
 			}catch(Exception ex){
 				

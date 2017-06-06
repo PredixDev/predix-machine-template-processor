@@ -31,32 +31,32 @@ import com.ge.predix.solsvc.edgestarter.model.TemplateProcessorResources;
 		IPredixKitService.class
 })
 public class PredixKitService extends Thread implements IPredixKitService{
-	
+
 	private static final Logger _logger = LoggerFactory.getLogger(PredixKitService.class);
-	
+
 	private TemplateProcessorResources _resources = TemplateProcessorResources.getInstance();
-	
+
 	/** Service PID for Sample Machine Adapter */
 	public static final String SERVICE_PID = "com.ge.predix.solsvc.edgestarter.kitservice"; //$NON-NLS-1$
-	
+
 	private IPredixCloudHttpClientFactory cloudHttpClientFactory;
 
     /** A reserved IHttpClient that supports Predix Cloud authenticated communication. */
     private IHttpClient                   cloudHttpClient;
-    
+
     private ITemplateProcessorConfig config;
-    
+
     private volatile boolean isShutdown = false;
 	private volatile boolean isRetryMode = false;
-	
+
 	private volatile int pollingInterval = 30;
 	private volatile int retryInterval = 0;
 	private volatile int currentInterval;
 	private int retries = 0;
 	private int maxRetries = 0;
-	
+
 	private ConfigurationAdmin configurationAdmin;
-	
+
 	/**
 	 * OSGi component lifecycle activation method
 	 *
@@ -67,14 +67,14 @@ public class PredixKitService extends Thread implements IPredixKitService{
 	 */
 	@Activate
 	public void activate(ComponentContext ctx) throws IOException {
-		_logger.info("Starting PredixKitService " + SERVICE_PID); //$NON-NLS-1$	
+		_logger.info("Starting PredixKitService " + SERVICE_PID); //$NON-NLS-1$
 		this.currentInterval = Integer.valueOf(this.config.getTaskInterval());
 		this.start();
 	}
 
 	/**
      * This method is called when the bundle is stopped.
-     * 
+     *
      * @param ctx Component Context
      */
     @Deactivate
@@ -90,7 +90,7 @@ public class PredixKitService extends Thread implements IPredixKitService{
     }
 	/**
      * Dependency injection for IPredixCloudHttpClientFactory
-     * 
+     *
      * @param clientFactory The IPredixCloudHttpClientFactory to inject
      */
     @Reference
@@ -109,7 +109,7 @@ public class PredixKitService extends Thread implements IPredixKitService{
 
     /**
      * Clear the injected IPredixCloudHttpClientFactory
-     * 
+     *
      * @param clientFactory The factory to clear.
      */
     public void unsetPredixCloudHttpClientFactory(IPredixCloudHttpClientFactory clientFactory)
@@ -126,11 +126,11 @@ public class PredixKitService extends Thread implements IPredixKitService{
 	public void setConfig(ITemplateProcessorConfig config) {
 		this.config = config;
 	}
-    
+
     public void validateDevice(){
     	if (!isShutdown
     			&& this.cloudHttpClient != null
-    			&& this.config.getPredixKitGetDeviceURL() != null 
+    			&& this.config.getPredixKitGetDeviceURL() != null
 				&& !"".equals(this.config.getPredixKitGetDeviceURL())) {
 			try
 	        {
@@ -139,22 +139,28 @@ public class PredixKitService extends Thread implements IPredixKitService{
 				String url = this.config.getPredixKitGetDeviceURL()+"/"+InetAddress.getLocalHost().getHostName();
 				_logger.info("Kit Device URL : "+url);
 	            URI getDeviceURL = new URI(url);
-	
+
 	            HttpResponseWrapper httpResponse = this.cloudHttpClient.get(getDeviceURL);
-	            
+
 	            _logger.info("GetDeviceResponse : "+httpResponse.getStatusCode());
-	            
+
 	            if (httpResponse.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
 	            	_logger.error("Device Registration not found.");
 		        //disconnectingMachineFromPredix();
 	            }
 	            String content = httpResponse.getContent();
 	            _logger.info("Response : "+content);
-	            if (!"".equals(content)) 
+	            if (!"".equals(content))
 	            {
-	            	ObjectMapper mapper = new ObjectMapper();
-	            	RegisterDevice device = mapper.readValue(content, RegisterDevice.class);
+								try {
+	            		ObjectMapper mapper = new ObjectMapper();
+	            		RegisterDevice device = mapper.readValue(content, RegisterDevice.class);
 	                _logger.info("Activation date : "+device.getActivationDate());
+								}
+								catch (org.codehaus.jackson.map.exc.UnrecognizedPropertyException e) {
+									_logger.error("An error occurred getting Registered Device Info content=" +content,e);
+									throw e;
+								}
 	            }
 	        }catch(Exception e){
 	        	_logger.error("An error occurred getting Registered Device Info",e);
@@ -174,8 +180,8 @@ public class PredixKitService extends Thread implements IPredixKitService{
 		}
 		_logger.info("Kit URL : "+this.config.getPredixKitGetDeviceURL());
 		validateDevice();
-		while (!this.isShutdown 
-				&& this.config.getPredixKitGetDeviceURL() != null 
+		while (!this.isShutdown
+				&& this.config.getPredixKitGetDeviceURL() != null
 						&& !"".equals(this.config.getPredixKitGetDeviceURL())) {
 			try {
 				sleep(this.currentInterval * 1000);
@@ -200,7 +206,7 @@ public class PredixKitService extends Thread implements IPredixKitService{
 		if (_logger.isDebugEnabled()) {
 			_logger.debug(_resources.getString("GatewayThread.gateway_stopping"));
 		}
-		
+
 	}
 	public void normalMode() {
 		if (this.isRetryMode) {
@@ -242,7 +248,7 @@ public class PredixKitService extends Thread implements IPredixKitService{
 		this.currentInterval = interval;
 		interrupt();
 	}
-	
+
 	public void shutdown() {
 		this.isShutdown = true;
 		interrupt();
@@ -251,7 +257,7 @@ public class PredixKitService extends Thread implements IPredixKitService{
 	public boolean isShutdown() {
 		return this.isShutdown;
 	}
-	
+
 	private void disconnectingMachineFromPredix() {
 		// TODO Auto-generated method stub
 		_logger.info("Disconnecting .....");
@@ -259,7 +265,7 @@ public class PredixKitService extends Thread implements IPredixKitService{
 			try {
 				Configuration[] configs = this.configurationAdmin.listConfigurations(null);
 				for (Configuration config : configs) {
-					
+
 					if ("com.ge.dspmicro.websocketriver.send".equals(config.getFactoryPid())) {
 						_logger.info("factory : "+config.getFactoryPid());
 						Dictionary<String, Object> props = config.getProperties();
@@ -286,7 +292,7 @@ public class PredixKitService extends Thread implements IPredixKitService{
 
 	@Override
 	public Boolean isRegistered() {
-		return this.config.getPredixKitGetDeviceURL() != null 
+		return this.config.getPredixKitGetDeviceURL() != null
 				&& !"".equals(this.config.getPredixKitGetDeviceURL());
 	}
 }
