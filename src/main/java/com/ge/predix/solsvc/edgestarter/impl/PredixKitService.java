@@ -157,7 +157,7 @@ public class PredixKitService extends Thread implements IPredixKitService{
 	            		RegisterDevice device = mapper.readValue(content, RegisterDevice.class);
 	                _logger.info("Activation date : "+device.getActivationDate());
 								}
-								catch (org.codehaus.jackson.map.exc.UnrecognizedPropertyException e) {
+								catch (Exception e) {
 									_logger.error("An error occurred getting Registered Device Info content=" +content,e);
 									throw e;
 								}
