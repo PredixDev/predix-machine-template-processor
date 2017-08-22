@@ -3,12 +3,14 @@ package com.ge.predix.solsvc.edgestarter.model;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 
 /**
  * 
  * @author 212421693 -
  */
-
 public class RegisterDevice
 {
     /**
@@ -51,17 +53,29 @@ public class RegisterDevice
     /**
      * 
      */
-    String createdDate;
+    private String createdDate;
     
     /**
      * 
      */
-    String updateDate;
+    private String updateDate;
     
+    private String error;
+    
+    private String error_description;
+    
+    private String scope;
     
     private Map<?, ?> deviceConfig;
     
     private Set<?> tags;
+    
+    private String message;
+    
+    private String status;
+    
+    private String timeStamp;
+    
     /**
      * @return the uri
      */
@@ -203,11 +217,54 @@ public class RegisterDevice
     {
         this.updateDate = updateDate;
     }
+    
 	public Set<?> getTags() {
 		return tags;
 	}
+	
 	public void setTags(Set<?> tags) {
 		this.tags = tags;
+	}
+	
+	@JsonProperty("error")
+	public String getError() {
+		return error;
+	}
+	public void setError(String error) {
+		this.error = error;
+	}
+	
+	@JsonProperty("scope")
+	public String getScope() {
+		return scope;
+	}
+	
+	public void setScope(String scope) {
+		this.scope = scope;
+	}
+	public String getError_description() {
+		return error_description;
+	}
+	public void setError_description(String error_description) {
+		this.error_description = error_description;
+	}
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getTimeStamp() {
+		return timeStamp;
+	}
+	public void setTimeStamp(String timeStamp) {
+		this.timeStamp = timeStamp;
 	}
     
     

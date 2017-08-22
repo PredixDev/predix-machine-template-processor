@@ -19,7 +19,7 @@ import com.ge.predix.solsvc.edgestarter.model.MachineStatusResponse;
 public class MachineStatusService implements IMachineStatusService{
 	
 	/** Service PID for Sample Machine Adapter */
-	public static final String SERVICE_PID = "com.ge.predix.solsvc.edgestarter.statusservice"; //$NON-NLS-1$
+	protected static final String SERVICE_PID = "com.ge.predix.solsvc.edgestarter.statusservice"; //$NON-NLS-1$
 	
 	/** Create logger to report errors, warning massages, and info messages (runtime Statistics) */
     protected static Logger                         _logger          = LoggerFactory.getLogger(MachineStatusService.class);
@@ -41,23 +41,27 @@ public class MachineStatusService implements IMachineStatusService{
 	public MachineStatusResponse getMachineStatusResponse() {
 		MachineStatusResponse response = new MachineStatusResponse();
 		response.setLastDataSent(processor.getLastDataSent());
-		long mins = Duration.between(Instant.ofEpochMilli(processor.getLastDataSent().getTimeInMillis()),Instant.now()).toMinutes();
-		_logger.info("Minutes : "+mins);
-		boolean connected = processor.isConnectedToTimeseries();
-		if (mins > 0 || !connected) {
-			if (!connected) {
-				response.setStatus(MachineStatus.LAUNCHED_NOT_CONNECTED.status);
-			}else {
-				response.setStatus(MachineStatus.LAUNCHED_NOT_SENDING_DATA.status);
-			}
-			response.setLastDataSent(null);
-		}else{
-			if (predixKitService.isRegistered()) {
-				response.setStatus(MachineStatus.LAUNCHED_SENDING_DATA.status);
-			}else {
-				response.setStatus(MachineStatus.LAUNCHED_SEND_DATA_NOTREGISTERED.status);
-			}			
-		}	
+		if (processor.getLastDataSent() == null) {
+			response.setStatus(MachineStatus.LAUNCHED_NOT_SENDING_DATA.status);
+		}else {
+			long mins = Duration.between(Instant.ofEpochMilli(processor.getLastDataSent().getTimeInMillis()),Instant.now()).toMinutes();
+			_logger.info("Minutes : "+mins);
+			boolean connected = processor.isConnectedToTimeseries();
+			if (mins > 0 || !connected) {
+				if (!connected) {
+					response.setStatus(MachineStatus.LAUNCHED_NOT_CONNECTED.status);
+				}else {
+					response.setStatus(MachineStatus.LAUNCHED_NOT_SENDING_DATA.status);
+				}
+				response.setLastDataSent(null);
+			}else{
+				if (predixKitService.isRegistered()) {
+					response.setStatus(MachineStatus.LAUNCHED_SENDING_DATA.status);
+				}else {
+					response.setStatus(MachineStatus.LAUNCHED_SEND_DATA_NOTREGISTERED.status);
+				}			
+			}	
+		}
 		return response;
 	}
 
@@ -79,7 +83,8 @@ public class MachineStatusService implements IMachineStatusService{
 		LAUNCHED("Launched"),LAUNCHED_SENDING_DATA("Launched - Sending Data"),
 		LAUNCHED_NOT_SENDING_DATA("Launched - Not Sending Data"),
 		LAUNCHED_SEND_DATA_NOTREGISTERED("Launched - Sending Data, Device not registered. Connected to custom Predix Timeseries"),
-		LAUNCHED_NOT_CONNECTED("Launched - Not connected to Predix");
+		LAUNCHED_NOT_CONNECTED("Launched - Not connected to Predix"),
+		LAUNCHED_REGISTRATION_EXPIRED("Launched - Registration Expired");
 		
 		private String status;
 		MachineStatus(String status){

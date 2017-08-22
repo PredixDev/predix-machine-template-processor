@@ -61,10 +61,13 @@ public class MachineProcessor implements IProcessor, ISampleProcessor {
 	/** Service PID for Sample Machine Adapter */
 	public static final String SERVICE_PID = "com.ge.predix.solsvc.edgestarter.processor"; //$NON-NLS-1$
 
-	private Calendar lastDataSent = Calendar.getInstance();
+	/*
+	 * Hold the last time data was sent to Timeseries
+	 */
+	private Calendar lastDataSent;
 
 	private IWebsocketSend websocketSend;	
-
+	
 	/**
 	 * @param ctx
 	 *            context of the bundle.
@@ -78,17 +81,16 @@ public class MachineProcessor implements IProcessor, ISampleProcessor {
 	 * @param ctx
 	 *            context of the bundle.
 	 */
-	@SuppressWarnings("unchecked")
 	@Deactivate
 	public void deactivate(ComponentContext ctx) {
-		if (_logger.isDebugEnabled()) {
-			_logger.debug("Spillway service deactivated."); //$NON-NLS-1$
-		}
+		_logger.info("Spillway service deactivated."); //$NON-NLS-1$
+		
 	}
 
 	@Override
 	public void processValues(String processType, List<ITransferable> values, ITransferData transferData)
 			throws ProcessorException {
+		lastDataSent = Calendar.getInstance();
 		_logger.info("processType : " + processType + " || VALUES :" + values.toString()); //$NON-NLS-1$
 		processValues(processType, new HashMap<String, String>(), values, transferData);
 	}
@@ -106,22 +108,11 @@ public class MachineProcessor implements IProcessor, ISampleProcessor {
 	public void processValues(String processType, Map<String, String> map, EdgeDataList values,
 			ITransferData transferData) throws ProcessorException {
 		lastDataSent = Calendar.getInstance();
-		/*
-		 * _logger.info("processType : "+processType+" || VALUES :"
-		 * +values.toString()); //$NON-NLS-1$ for (EdgeData edgeData :
-		 * values.getEdgeDataList()) {
-		 * _logger.info("EdgeDataNodeName : "+edgeData.getNodeName()); }
-		 * transferData.transferData(values, map);
-		 */
 	}
 
 	@Override
 	public Calendar getLastDataSent() {
 		return lastDataSent;
-	}
-
-	public void setLastDataSent(Calendar lastDataSent) {
-		this.lastDataSent = lastDataSent;
 	}
 
 	@Override
@@ -141,10 +132,13 @@ public class MachineProcessor implements IProcessor, ISampleProcessor {
 		// create pong notification
 		TestPongNotification pongNotification = new TestPongNotification();
 
+		//Create the ping message
 		IPingMessage ping = route.createPingMessage(params, pongNotification);
 		route.ping(ping);
+		//Read the status of the ping message
 		PongStatus status = pongNotification.status();
 		Instant start = Instant.now();
+		//keep looping if start and now is less than one min or status is SUCCESSFUL
 		while (
 			(Duration.between(Instant.ofEpochMilli(start.toEpochMilli()),Instant.now()).toMinutes() < 1 ) &&
 			(status == null || !status.equals(PongStatus.SUCCESSFUL) || !status.equals(PongStatus.COMPLETED) || !status.equals(PongStatus.FAILED))) {
@@ -171,7 +165,7 @@ public class MachineProcessor implements IProcessor, ISampleProcessor {
 		this.websocketSend = websocketSend;
 	}
 
-	public static class TestPongNotification implements IPongNotification {
+	private static class TestPongNotification implements IPongNotification {
 		private PongStatus status = null;
 
 		@Override

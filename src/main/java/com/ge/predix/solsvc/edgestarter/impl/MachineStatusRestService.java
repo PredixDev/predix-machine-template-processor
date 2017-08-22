@@ -95,8 +95,15 @@ public class MachineStatusRestService implements IHttpRestServer
 	@GET
 	@Path("/status")
 	@Produces(MediaType.APPLICATION_JSON)
-	public MachineStatusResponse listExistingConfig() {
-		return machineStatus.getMachineStatusResponse();
+	public MachineStatusResponse getMachineStatusResponse() {
+		try {
+			return machineStatus.getMachineStatusResponse();
+		}catch(Throwable t){
+			_logger.error("Unexpected error occurred",t);
+			MachineStatusResponse res = new MachineStatusResponse();
+			res.setStatus("Unexpected error occurred. Please click View Log to see additional details");
+			return res;
+		}
 	}
 
 	public IMachineStatusService getMachineStatus() {

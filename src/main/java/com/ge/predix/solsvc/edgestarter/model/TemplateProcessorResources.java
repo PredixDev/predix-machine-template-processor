@@ -5,7 +5,9 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+/*
+ * Resources : read resources properties from TemplateProcessorResources.
+ */
 public class TemplateProcessorResources
 {
   private static final String BUNDLE = "TemplateProcessorResources";

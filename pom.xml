@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ge.predix.solsvc</groupId>
 	<artifactId>predix-machine-template-processor</artifactId>
-	<version>2.1.23</version>
+	<version>2.1.24</version>
 	<packaging>bundle</packaging>
 
 	<properties>
@@ -86,8 +86,8 @@
         <skipTests>false</skipTests>
 
 		<!-- Predix Machine project versions -->
-        <dspmicro.version>17.1.0</dspmicro.version>
-        <dspmicro.parent.project.version>17.1.0</dspmicro.parent.project.version>
+        <dspmicro.version>17.1.2</dspmicro.version>
+        <dspmicro.parent.project.version>17.1.2</dspmicro.parent.project.version>
 
         <!-- Predix Machine bundle versions -->
         <dspmicro.databus.project.version>${dspmicro.parent.project.version}</dspmicro.databus.project.version>
@@ -376,6 +376,7 @@
 							org.apache.http.*,
 							org.codehaus.jackson.map,
 							org.apache.commons.lang,
+							com.google.gson,
 							com.google.protobuf;version=${import.com.google.protobuf},
 							com.ge.dspmicro.hoover.api.spillway;version=${import.com.ge.dspmicro.hoover.api},
                             com.ge.dspmicro.hoover.api.processor;version=${import.com.ge.dspmicro.hoover.api},

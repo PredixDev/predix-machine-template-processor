@@ -16,7 +16,7 @@ package com.ge.predix.solsvc.edgestarter.api;
  */
 public interface IHttpRestServer {
 	/**
-	 * 
+	 * This interface defined the root service for HTTP server
 	 */
 	public static final String PATH = "/service"; //$NON-NLS-1$
 }
