@@ -4,9 +4,6 @@ import java.time.Duration;
 import java.time.Instant;
 
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +12,11 @@ import com.ge.predix.solsvc.edgestarter.api.IPredixKitService;
 import com.ge.predix.solsvc.edgestarter.api.ISampleProcessor;
 import com.ge.predix.solsvc.edgestarter.model.MachineStatusResponse;
 
-@Component(name=MachineStatusService.SERVICE_PID,service = {IMachineStatusService.class})
+import aQute.bnd.annotation.component.Activate;
+import aQute.bnd.annotation.component.Component;
+import aQute.bnd.annotation.component.Reference;
+
+@Component(name=MachineStatusService.SERVICE_PID,provide = {IMachineStatusService.class})
 public class MachineStatusService implements IMachineStatusService{
 	
 	/** Service PID for Sample Machine Adapter */

@@ -18,10 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,13 +35,18 @@ import com.ge.dspmicro.websocketriver.send.api.IWebsocketSend;
 import com.ge.predix.solsvc.edgestarter.api.ISampleProcessor;
 import com.ge.predixmachine.datamodel.datacomm.EdgeDataList;
 
+import aQute.bnd.annotation.component.Activate;
+import aQute.bnd.annotation.component.Component;
+import aQute.bnd.annotation.component.Deactivate;
+import aQute.bnd.annotation.component.Reference;
+
 /**
  * This class provides a Processor implementation which will process the data as
  * per configuration on the spillway.
  */
 @Component(immediate = true, 
 	name = MachineProcessor.SERVICE_PID, 
-	service = { 
+	provide = { 
 		IProcessor.class, 
 		ISampleProcessor.class,
 	}

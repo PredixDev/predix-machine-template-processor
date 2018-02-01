@@ -14,10 +14,6 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +26,12 @@ import com.ge.predix.solsvc.edgestarter.model.TemplateProcessorResources;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-@Component(name = PredixKitService.SERVICE_PID, service = { IPredixKitService.class })
+import aQute.bnd.annotation.component.Activate;
+import aQute.bnd.annotation.component.Component;
+import aQute.bnd.annotation.component.Deactivate;
+import aQute.bnd.annotation.component.Reference;
+
+@Component(name = PredixKitService.SERVICE_PID, provide = { IPredixKitService.class })
 public class PredixKitService extends Thread implements IPredixKitService {
 
 	private static final Logger _logger = LoggerFactory.getLogger(PredixKitService.class);
