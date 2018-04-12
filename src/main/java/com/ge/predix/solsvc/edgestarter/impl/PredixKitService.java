@@ -141,7 +141,7 @@ public class PredixKitService extends Thread implements IPredixKitService {
 				_logger.debug("GetDeviceResponse : " + httpResponse.getStatusCode());
 
 				content = httpResponse.getContent();
-				_logger.info("HTTP Status : "+httpResponse.getStatusCode()+" ExpiredStatus Code : "+config.getExpiredStatusCode().intValue());
+				_logger.info("HTTP Status : "+httpResponse.getStatusCode());
 				_logger.info("Response : " + content);
 				if (!"".equals(content)) {
 					JsonParser parser = new JsonParser();
@@ -149,6 +149,7 @@ public class PredixKitService extends Thread implements IPredixKitService {
 					
 					switch (httpResponse.getStatusCode()) {
 					case HttpStatus.SC_BAD_REQUEST :
+				                _logger.info("Device Status : " + obj.get("status") + " ExpiredStatus Code : "+config.getExpiredStatusCode().intValue());
 						if (obj.get("status").getAsInt() == config.getExpiredStatusCode().intValue()){
 							_logger.error("Error : "+obj.get("error").getAsString());
 							_logger.error("Error Description : "+obj.get("message").getAsString());
