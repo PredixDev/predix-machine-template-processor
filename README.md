@@ -13,4 +13,4 @@ The SimpleServiceImpl.java class shows how to create a osgi component with init 
 
 The TestHttpServer class shows how to host a rest end point.
 
-[![Analytics](https://ga-beacon.appspot.com/UA-82773213-1/predix-machine-template-processor/readme?pixel)](https://github.com/PredixDev)
+[![Analytics](https://predix-beacon.appspot.com/UA-82773213-1/predix-machine-template-processor/readme?pixel)](https://github.com/PredixDev)

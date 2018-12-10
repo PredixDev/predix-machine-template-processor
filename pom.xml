@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ge.predix.solsvc</groupId>
 	<artifactId>predix-machine-template-processor</artifactId>
-	<version>2.2.14</version>
+	<version>2.2.15</version>
 	<packaging>bundle</packaging>
 
 	<properties>
@@ -31,7 +31,7 @@
         <org.slf4j.version>1.7.21</org.slf4j.version>
         
         <!-- This actually drives the BND used during compile time. The version of this plugin will map to a version of BND -->
-        <org.apache.felix.maven-bundle-plugin.version>3.0.1</org.apache.felix.maven-bundle-plugin.version>
+        <org.apache.felix.maven-bundle-plugin.version>3.5.0</org.apache.felix.maven-bundle-plugin.version>
 
 		<!-- 3rd Party Compile-Dependency Bundle versions -->
         <org.osgi.core.version>5.0.0</org.osgi.core.version>
@@ -360,6 +360,7 @@
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
+				<version>${org.apache.felix.maven-bundle-plugin.version}</version>
 				<configuration>
 					<instructions>
 						<_noee>true</_noee>
